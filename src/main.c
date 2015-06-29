@@ -38,8 +38,8 @@ int main(int argc, char **argv) {
 
     set_log_level(LOG_LEVEL_WARN);
 
-    work_queue = NULL;
-    work_queue_tail = NULL;
+    m_work_queue = NULL;
+    m_work_queue_tail = NULL;
     memset(&stats, 0, sizeof(stats));
     root_ignores = init_ignore(NULL, "", 0);
     out_fd = stdout;
@@ -78,18 +78,18 @@ int main(int argc, char **argv) {
     }
 
     log_debug("Using %i workers", workers_len);
-    done_adding_files = FALSE;
+    m_done_adding_files = FALSE;
     workers = ag_calloc(workers_len, sizeof(worker_t));
-    if (pthread_cond_init(&files_ready, NULL)) {
+    if (pthread_cond_init(&m_files_ready_cond, NULL)) {
         die("pthread_cond_init failed!");
     }
-    if (pthread_mutex_init(&print_mtx, NULL)) {
+    if (pthread_mutex_init(&m_print_mtx, NULL)) {
         die("pthread_mutex_init failed!");
     }
-    if (pthread_mutex_init(&stats_mtx, NULL)) {
+    if (pthread_mutex_init(&m_stats_mtx, NULL)) {
         die("pthread_mutex_init failed!");
     }
-    if (pthread_mutex_init(&work_queue_mtx, NULL)) {
+    if (pthread_mutex_init(&m_work_queue_mtx, NULL)) {
         die("pthread_mutex_init failed!");
     }
 
@@ -170,10 +170,13 @@ int main(int argc, char **argv) {
             search_dir(ig, base_paths[i], paths[i], 0, s.st_dev);
             cleanup_ignore(ig);
         }
-        pthread_mutex_lock(&work_queue_mtx);
-        done_adding_files = TRUE;
-        pthread_cond_broadcast(&files_ready);
-        pthread_mutex_unlock(&work_queue_mtx);
+        pthread_mutex_lock(&m_work_queue_mtx);
+        m_done_adding_files = TRUE;
+        
+        // 指定のcondition varibale condで待っている全てのスレッドをunblockする
+        pthread_cond_broadcast(&m_files_ready_cond);
+        
+        pthread_mutex_unlock(&m_work_queue_mtx);
         for (i = 0; i < workers_len; i++) {
             if (pthread_join(workers[i].thread, NULL)) {
                 die("pthread_join failed!");
@@ -194,10 +197,10 @@ int main(int argc, char **argv) {
         pclose(out_fd);
     }
     cleanup_options();
-    pthread_cond_destroy(&files_ready);
-    pthread_mutex_destroy(&work_queue_mtx);
-    pthread_mutex_destroy(&stats_mtx);
-    pthread_mutex_destroy(&print_mtx);
+    pthread_cond_destroy(&m_files_ready_cond); // cleanup
+    pthread_mutex_destroy(&m_work_queue_mtx);
+    pthread_mutex_destroy(&m_stats_mtx);
+    pthread_mutex_destroy(&m_print_mtx);
     cleanup_ignore(root_ignores);
     free(workers);
     for (i = 0; paths[i] != NULL; i++) {

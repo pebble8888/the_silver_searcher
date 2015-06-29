@@ -1,7 +1,22 @@
 #include "search.h"
 #include "scandir.h"
 
-void search_buf(const char *buf, const size_t buf_len,
+size_t alpha_skip_lookup[256];
+size_t *find_skip_lookup;
+work_queue_t *      m_work_queue;
+work_queue_t *      m_work_queue_tail;
+int                 m_done_adding_files;
+pthread_cond_t      m_files_ready_cond;
+pthread_mutex_t     m_print_mtx;
+pthread_mutex_t     m_stats_mtx;
+pthread_mutex_t     m_work_queue_mtx;
+symdir_t *symhash;
+
+/**
+ *
+ */
+void search_buf(const char *buf,
+                const size_t buf_len,
                 const char *dir_full_path) {
     int binary = -1; /* 1 = yes, 0 = no, -1 = don't know */
     size_t buf_offset = 0;
@@ -123,21 +138,21 @@ void search_buf(const char *buf, const size_t buf_len,
     }
 
     if (opts.stats) {
-        pthread_mutex_lock(&stats_mtx);
+        pthread_mutex_lock(&m_stats_mtx);
         stats.total_bytes += buf_len;
         stats.total_files++;
         stats.total_matches += matches_len;
         if (matches_len > 0) {
             stats.total_file_matches++;
         }
-        pthread_mutex_unlock(&stats_mtx);
+        pthread_mutex_unlock(&m_stats_mtx);
     }
 
     if (matches_len > 0) {
         if (binary == -1 && !opts.print_filename_only) {
             binary = is_binary((const void *)buf, buf_len);
         }
-        pthread_mutex_lock(&print_mtx);
+        pthread_mutex_lock(&m_print_mtx);
         if (opts.print_filename_only) {
             /* If the --files-without-matches or -L option is passed we should
              * not print a matching line. This option currently sets
@@ -158,7 +173,7 @@ void search_buf(const char *buf, const size_t buf_len,
         } else {
             print_file_matches(dir_full_path, buf, buf_len, matches, matches_len);
         }
-        pthread_mutex_unlock(&print_mtx);
+        pthread_mutex_unlock(&m_print_mtx);
         opts.match_found = 1;
     } else if (opts.search_stream && opts.passthrough) {
         fprintf(out_fd, "%s", buf);
@@ -186,6 +201,9 @@ void search_stream(FILE *stream, const char *path) {
     free(line);
 }
 
+/**
+ *
+ */
 void search_file(const char *file_full_path) {
     int fd;
     off_t f_len = 0;
@@ -305,21 +323,25 @@ void *search_file_worker(void *i) {
 
     log_debug("Worker %i started", worker_id);
     while (TRUE) {
-        pthread_mutex_lock(&work_queue_mtx);
-        while (work_queue == NULL) {
-            if (done_adding_files) {
-                pthread_mutex_unlock(&work_queue_mtx);
+        pthread_mutex_lock(&m_work_queue_mtx);
+        while (m_work_queue == NULL) {
+            if (m_done_adding_files) {
+                pthread_mutex_unlock(&m_work_queue_mtx);
                 log_debug("Worker %i finished.", worker_id);
                 pthread_exit(NULL);
             }
-            pthread_cond_wait(&files_ready, &work_queue_mtx);
+            // この関数を呼び出す前にはmutexはロックされていなければならない。
+            // 他のスレッドがcondition variableに対して、pthread_cond_signal()または
+            // pthread_cond_broadcast()を呼び出すまでブロックする。
+            // 呼び出されたときはこの関数から返るが、そのときmutexはロックされた状態になる。
+            pthread_cond_wait(&m_files_ready_cond, &m_work_queue_mtx);
         }
-        queue_item = work_queue;
-        work_queue = work_queue->next;
-        if (work_queue == NULL) {
-            work_queue_tail = NULL;
+        queue_item = m_work_queue;
+        m_work_queue = m_work_queue->next;
+        if (m_work_queue == NULL) {
+            m_work_queue_tail = NULL;
         }
-        pthread_mutex_unlock(&work_queue_mtx);
+        pthread_mutex_unlock(&m_work_queue_mtx);
 
         search_file(queue_item->path);
         free(queue_item->path);
@@ -486,9 +508,9 @@ void search_dir(ignores *ig, const char *base_path, const char *path, const int 
                     goto cleanup;
                 } else if (opts.match_files) {
                     log_debug("match_files: file_search_regex matched for %s.", dir_full_path);
-                    pthread_mutex_lock(&print_mtx);
+                    pthread_mutex_lock(&m_print_mtx);
                     print_path(dir_full_path, opts.path_sep);
-                    pthread_mutex_unlock(&print_mtx);
+                    pthread_mutex_unlock(&m_print_mtx);
                     opts.match_found = 1;
                     goto cleanup;
                 }
@@ -497,15 +519,18 @@ void search_dir(ignores *ig, const char *base_path, const char *path, const int 
             queue_item = ag_malloc(sizeof(work_queue_t));
             queue_item->path = dir_full_path;
             queue_item->next = NULL;
-            pthread_mutex_lock(&work_queue_mtx);
-            if (work_queue_tail == NULL) {
-                work_queue = queue_item;
+            pthread_mutex_lock(&m_work_queue_mtx);
+            if (m_work_queue_tail == NULL) {
+                m_work_queue = queue_item;
             } else {
-                work_queue_tail->next = queue_item;
+                m_work_queue_tail->next = queue_item;
             }
-            work_queue_tail = queue_item;
-            pthread_cond_signal(&files_ready);
-            pthread_mutex_unlock(&work_queue_mtx);
+            m_work_queue_tail = queue_item;
+
+            // condition variablesで待っている複数あるうちの一つのスレッドのブロックを解除する
+            pthread_cond_signal(&m_files_ready_cond);
+
+            pthread_mutex_unlock(&m_work_queue_mtx);
             log_debug("%s added to work queue", dir_full_path);
         } else if (opts.recurse_dirs) {
             if (depth < opts.max_search_depth || opts.max_search_depth == -1) {

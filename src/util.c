@@ -8,6 +8,9 @@
 #include "util.h"
 #include "config.h"
 
+FILE *out_fd;
+ag_stats stats;
+
 #ifdef _WIN32
 #define flockfile(x)
 #define funlockfile(x)
