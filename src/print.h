@@ -3,6 +3,10 @@
 
 #include "util.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void print_path(const char *path, const char sep);
 void print_path_count(const char *path, const char sep, const size_t count);
 void print_line(const char *buf, size_t buf_pos, size_t prev_line_offset);
@@ -17,6 +21,10 @@ const char *normalize_path(const char *path);
 #ifdef _WIN32
 void windows_use_ansi(int use_ansi);
 int fprintf_w32(FILE *fp, const char *format, ...);
+#endif
+    
+#ifdef __cplusplus
+}
 #endif
 
 #endif

@@ -12,7 +12,6 @@
 #include "log.h"
 #include "options.h"
 
-extern FILE *out_fd;
 
 #ifndef TRUE
 #define TRUE 1
@@ -21,12 +20,6 @@ extern FILE *out_fd;
 #ifndef FALSE
 #define FALSE 0
 #endif
-
-void *ag_malloc(size_t size);
-void *ag_realloc(void *ptr, size_t size);
-void *ag_calloc(size_t nelem, size_t elsize);
-char *ag_strdup(const char *s);
-char *ag_strndup(const char *s, size_t size);
 
 typedef struct {
     size_t start; /* Byte at which the match starts */
@@ -49,9 +42,21 @@ typedef enum {
     AG_ZIP
 } ag_compression_type;
 
-extern ag_stats stats;
 
 typedef const char *(*strncmp_fp)(const char *, const char *, const size_t, const size_t, const size_t[], const size_t *);
+
+extern FILE *out_fd;
+extern ag_stats stats;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+    
+void *ag_malloc(size_t size);
+void *ag_realloc(void *ptr, size_t size);
+void *ag_calloc(size_t nelem, size_t elsize);
+char *ag_strdup(const char *s);
+char *ag_strndup(const char *s, size_t size);
 
 void free_strings(char **strs, const size_t strs_len);
 
@@ -108,6 +113,10 @@ size_t strlcpy(char *dest, const char *src, size_t size);
 #endif
 #ifndef HAVE_VASPRINTF
 int vasprintf(char **ret, const char *fmt, va_list args);
+#endif
+    
+#ifdef __cplusplus
+}
 #endif
 
 #endif

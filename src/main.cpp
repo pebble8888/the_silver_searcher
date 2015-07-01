@@ -79,19 +79,7 @@ int main(int argc, char **argv) {
 
     log_debug("Using %i workers", workers_len);
     m_done_adding_files = FALSE;
-    workers = ag_calloc(workers_len, sizeof(worker_t));
-    if (pthread_cond_init(&m_files_ready_cond, NULL)) {
-        die("pthread_cond_init failed!");
-    }
-    if (pthread_mutex_init(&m_print_mtx, NULL)) {
-        die("pthread_mutex_init failed!");
-    }
-    if (pthread_mutex_init(&m_stats_mtx, NULL)) {
-        die("pthread_mutex_init failed!");
-    }
-    if (pthread_mutex_init(&m_work_queue_mtx, NULL)) {
-        die("pthread_mutex_init failed!");
-    }
+    workers = (worker_t*)ag_calloc(workers_len, sizeof(worker_t));
 
     if (opts.casing == CASE_SMART) {
         opts.casing = is_lowercase(opts.query) ? CASE_INSENSITIVE : CASE_SENSITIVE;
@@ -167,16 +155,17 @@ int main(int argc, char **argv) {
                 log_err("Failed to get device information for path %s. Skipping...", paths[i]);
             }
 #endif
+            // 全ての再帰が終わるとここから抜ける
             search_dir(ig, base_paths[i], paths[i], 0, s.st_dev);
             cleanup_ignore(ig);
         }
-        pthread_mutex_lock(&m_work_queue_mtx);
-        m_done_adding_files = TRUE;
-        
-        // 指定のcondition varibale condで待っている全てのスレッドをunblockする
-        pthread_cond_broadcast(&m_files_ready_cond);
-        
-        pthread_mutex_unlock(&m_work_queue_mtx);
+        {
+            std::lock_guard<std::mutex> l(m_work_queue_mtx);
+            m_done_adding_files = TRUE;
+            
+            // 指定のcondition varibale condで待っている全てのワーカースレッドをunblockし終了させる
+            m_files_ready_cond.notify_all();
+        }
         for (i = 0; i < workers_len; i++) {
             if (pthread_join(workers[i].thread, NULL)) {
                 die("pthread_join failed!");
@@ -197,10 +186,6 @@ int main(int argc, char **argv) {
         pclose(out_fd);
     }
     cleanup_options();
-    pthread_cond_destroy(&m_files_ready_cond); // cleanup
-    pthread_mutex_destroy(&m_work_queue_mtx);
-    pthread_mutex_destroy(&m_stats_mtx);
-    pthread_mutex_destroy(&m_print_mtx);
     cleanup_ignore(root_ignores);
     free(workers);
     for (i = 0; paths[i] != NULL; i++) {

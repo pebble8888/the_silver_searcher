@@ -11,11 +11,11 @@
 		A24C3CBE1B4182010082B039 /* ignore.c in Sources */ = {isa = PBXBuildFile; fileRef = A24C3CAA1B4182010082B039 /* ignore.c */; };
 		A24C3CBF1B4182010082B039 /* lang.c in Sources */ = {isa = PBXBuildFile; fileRef = A24C3CAC1B4182010082B039 /* lang.c */; };
 		A24C3CC01B4182010082B039 /* log.c in Sources */ = {isa = PBXBuildFile; fileRef = A24C3CAE1B4182010082B039 /* log.c */; };
-		A24C3CC11B4182010082B039 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = A24C3CB01B4182010082B039 /* main.c */; };
+		A24C3CC11B4182010082B039 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A24C3CB01B4182010082B039 /* main.cpp */; };
 		A24C3CC21B4182010082B039 /* options.c in Sources */ = {isa = PBXBuildFile; fileRef = A24C3CB11B4182010082B039 /* options.c */; };
 		A24C3CC41B4182010082B039 /* print.c in Sources */ = {isa = PBXBuildFile; fileRef = A24C3CB41B4182010082B039 /* print.c */; };
 		A24C3CC51B4182010082B039 /* scandir.c in Sources */ = {isa = PBXBuildFile; fileRef = A24C3CB61B4182010082B039 /* scandir.c */; };
-		A24C3CC61B4182010082B039 /* search.c in Sources */ = {isa = PBXBuildFile; fileRef = A24C3CB81B4182010082B039 /* search.c */; };
+		A24C3CC61B4182010082B039 /* search.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A24C3CB81B4182010082B039 /* search.cpp */; };
 		A24C3CC71B4182010082B039 /* util.c in Sources */ = {isa = PBXBuildFile; fileRef = A24C3CBB1B4182010082B039 /* util.c */; };
 		A2B367201B41974A005B2EBA /* liblzma.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2B3671F1B41974A005B2EBA /* liblzma.dylib */; };
 		A2B367221B419786005B2EBA /* libpcre.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2B367211B419786005B2EBA /* libpcre.dylib */; };
@@ -44,14 +44,14 @@
 		A24C3CAD1B4182010082B039 /* lang.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lang.h; path = ../../lang.h; sourceTree = "<group>"; };
 		A24C3CAE1B4182010082B039 /* log.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = log.c; path = ../../log.c; sourceTree = "<group>"; };
 		A24C3CAF1B4182010082B039 /* log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = log.h; path = ../../log.h; sourceTree = "<group>"; };
-		A24C3CB01B4182010082B039 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = main.c; path = ../../main.c; sourceTree = "<group>"; };
+		A24C3CB01B4182010082B039 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../../main.cpp; sourceTree = "<group>"; };
 		A24C3CB11B4182010082B039 /* options.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = options.c; path = ../../options.c; sourceTree = "<group>"; };
 		A24C3CB21B4182010082B039 /* options.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = options.h; path = ../../options.h; sourceTree = "<group>"; };
 		A24C3CB41B4182010082B039 /* print.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = print.c; path = ../../print.c; sourceTree = "<group>"; };
 		A24C3CB51B4182010082B039 /* print.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = print.h; path = ../../print.h; sourceTree = "<group>"; };
 		A24C3CB61B4182010082B039 /* scandir.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = scandir.c; path = ../../scandir.c; sourceTree = "<group>"; };
 		A24C3CB71B4182010082B039 /* scandir.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = scandir.h; path = ../../scandir.h; sourceTree = "<group>"; };
-		A24C3CB81B4182010082B039 /* search.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = search.c; path = ../../search.c; sourceTree = "<group>"; };
+		A24C3CB81B4182010082B039 /* search.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = search.cpp; path = ../../search.cpp; sourceTree = "<group>"; };
 		A24C3CB91B4182010082B039 /* search.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = search.h; path = ../../search.h; sourceTree = "<group>"; };
 		A24C3CBA1B4182010082B039 /* uthash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uthash.h; path = ../../uthash.h; sourceTree = "<group>"; };
 		A24C3CBB1B4182010082B039 /* util.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = util.c; path = ../../util.c; sourceTree = "<group>"; };
@@ -107,14 +107,14 @@
 				A24C3CAD1B4182010082B039 /* lang.h */,
 				A24C3CAE1B4182010082B039 /* log.c */,
 				A24C3CAF1B4182010082B039 /* log.h */,
-				A24C3CB01B4182010082B039 /* main.c */,
+				A24C3CB01B4182010082B039 /* main.cpp */,
 				A24C3CB11B4182010082B039 /* options.c */,
 				A24C3CB21B4182010082B039 /* options.h */,
 				A24C3CB41B4182010082B039 /* print.c */,
 				A24C3CB51B4182010082B039 /* print.h */,
 				A24C3CB61B4182010082B039 /* scandir.c */,
 				A24C3CB71B4182010082B039 /* scandir.h */,
-				A24C3CB81B4182010082B039 /* search.c */,
+				A24C3CB81B4182010082B039 /* search.cpp */,
 				A24C3CB91B4182010082B039 /* search.h */,
 				A24C3CBA1B4182010082B039 /* uthash.h */,
 				A24C3CBB1B4182010082B039 /* util.c */,
@@ -179,8 +179,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A24C3CC11B4182010082B039 /* main.c in Sources */,
-				A24C3CC61B4182010082B039 /* search.c in Sources */,
+				A24C3CC11B4182010082B039 /* main.cpp in Sources */,
+				A24C3CC61B4182010082B039 /* search.cpp in Sources */,
 				A24C3CC51B4182010082B039 /* scandir.c in Sources */,
 				A24C3CC01B4182010082B039 /* log.c in Sources */,
 				A24C3CBD1B4182010082B039 /* decompress.c in Sources */,

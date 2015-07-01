@@ -91,11 +91,18 @@ extern cli_options opts;
 
 typedef struct option option_t;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void usage(void);
 void print_version(void);
-
 void init_options(void);
 void parse_options(int argc, char **argv, char **base_paths[], char **paths[]);
 void cleanup_options(void);
+    
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -11,6 +11,10 @@ enum log_level {
     LOG_LEVEL_NONE = 100
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void set_log_level(enum log_level threshold);
 
 void log_debug(const char *fmt, ...);
@@ -20,5 +24,9 @@ void log_err(const char *fmt, ...);
 
 void vplog(const unsigned int level, const char *fmt, va_list args);
 void plog(const unsigned int level, const char *fmt, ...);
+    
+#ifdef __cplusplus
+}
+#endif
 
 #endif

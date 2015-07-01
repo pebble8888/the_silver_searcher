@@ -11,9 +11,17 @@ typedef struct {
 
 typedef int (*filter_fp)(const char *path, const struct dirent *, void *);
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int ag_scandir(const char *dirname,
                struct dirent ***namelist,
                filter_fp filter,
                void *baton);
+    
+#ifdef __cplusplus
+}
+#endif
 
 #endif

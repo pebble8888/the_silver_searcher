@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <mutex>
 #ifdef _WIN32
 #include <windows.h>
 #else
@@ -56,20 +57,22 @@ extern size_t *find_skip_lookup;
 extern work_queue_t *      m_work_queue;
 extern work_queue_t *      m_work_queue_tail;
 extern int                 m_done_adding_files;
-extern pthread_cond_t      m_files_ready_cond;
-extern pthread_mutex_t     m_print_mtx;
-extern pthread_mutex_t     m_stats_mtx;
-extern pthread_mutex_t     m_work_queue_mtx;
+extern std::condition_variable m_files_ready_cond;
+extern std::mutex          m_print_mtx;
+extern std::mutex          m_stats_mtx;
+extern std::mutex          m_work_queue_mtx;
 extern symdir_t *symhash;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-void search_buf(const char *buf, const size_t buf_len,
-                const char *dir_full_path);
 void search_stream(FILE *stream, const char *path);
-void search_file(const char *file_full_path);
-
 void *search_file_worker(void *i);
-
 void search_dir(ignores *ig, const char *base_path, const char *path, const int depth, dev_t original_dev);
+    
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -36,16 +36,20 @@ extern ignores *root_ignores;
 extern const char *evil_hardcoded_ignore_files[];
 extern const char *ignore_pattern_files[];
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 ignores *init_ignore(ignores *parent, const char *dirname, const size_t dirname_len);
 void cleanup_ignore(ignores *ig);
-
 void add_ignore_pattern(ignores *ig, const char *pattern);
-
 void load_ignore_patterns(ignores *ig, const char *path);
 void load_svn_ignore_patterns(ignores *ig, const char *path);
-
 int filename_filter(const char *path, const struct dirent *dir, void *baton);
-
 int is_empty(ignores *ig);
+    
+#ifdef __cplusplus
+}
+#endif
 
 #endif
